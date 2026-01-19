@@ -4,20 +4,16 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing import image
 import numpy as np
 
-# --- CONFIGURATION ---
 st.set_page_config(
     page_title="Pneumonia Detection App",
     page_icon="🩺",
     layout="wide"
 )
 
-# --- MODEL AND IMAGE CONSTANTS ---
 IMAGE_SIZE = (224, 224)
-# **IMPORTANT**: Paste the direct download link to your .keras file from GitHub Releases
 MODEL_URL = "https://github.com/4mo4cyb3r5l4y3r2/medical-image-classifier-pneumonia-/releases/download/v1.0/best_pneumonia_finetuned.keras" 
 MODEL_FILENAME = "best_pneumonia_finetuned.keras"
 
-# --- LOAD THE TRAINED MODEL ---
 @st.cache_resource
 def load_pneumonia_model():
     """Downloads the model from the URL and loads it into memory."""
@@ -34,7 +30,6 @@ def load_pneumonia_model():
 
 model = load_pneumonia_model()
 
-# --- WEB APP INTERFACE ---
 st.title("Chest X-Ray Pneumonia Detection 🩺")
 st.write("Upload a chest X-ray image, and a fine-tuned ResNet50 model will predict if it shows signs of pneumonia.")
 
@@ -46,17 +41,14 @@ if uploaded_file is not None and model is not None:
     
     with st.spinner('Classifying...'):
         try:
-            # Pre-process the image
             img = image.load_img(uploaded_file, target_size=IMAGE_SIZE)
             img_array = image.img_to_array(img)
             img_array = np.expand_dims(img_array, axis=0)
             img_array /= 255.0
 
-            # Make prediction
             prediction = model.predict(img_array)
             probability = prediction[0][0]
 
-            # Display the result
             st.write("--- Prediction Result ---")
             if probability > 0.5:
                 st.error(f"Prediction: PNEUMONIA (Confidence: {probability * 100:.2f}%)")
